@@ -1,54 +1,45 @@
 <template>
-  <Loader v-if="isLoading" />
-  <div v-else>
-    <div class="container">
-      <div class="goods">
-        <ICard v-for="product of products" :key="product.id" :product="product"></ICard>
-        <div>
 
-        </div>
-      </div>
-    </div>
-  </div>
+  <DefaultLayout>
+    <template #header>
+      <Header></Header>
+    </template>
+    <template #navigation>
+      <Navigation @set-page="page = $event" @search-input="searchActive($event)"></Navigation>
+    </template>
+    <template #default>
+      <Catalog v-if="page == 'Catalog'" :searchVal="searchValue"></Catalog>
+      <Checkout @page="page = $event" v-if="page === 'Checkout'"></Checkout>
+      <AddGoods v-if="page === 'AddGoods'"></AddGoods>
+    </template>
+    <template #footer>
+      <Footer></Footer>
+    </template>
 
+  </DefaultLayout>
 </template>
 
 <script setup>
+import DefaultLayout from '@/Layout/DefaultLayout.vue';
+import Header from '@/components/Header.vue';
+import AddGoods from '@/components/AddGoods.vue';
+import Catalog from '@/components/Catalog.vue';
+import Checkout from '@/components/Checkout.vue';
+import Navigation from '@/components/Navigation.vue';
+import Footer from '@/components/Footer.vue';
+import { ref } from 'vue';
 
-import {onMounted, ref } from 'vue';
-import ICard from './components/Card.vue';
-import Loader from './components/Layout/Loader.vue';
-
-const products = ref([])
-const isLoading = ref(true)
-
-onMounted(async () => {
-    const res = await fetch('https://fakestoreapi.com/products')
-if (res.ok) {
-   products.value = await res.json();
-   setTimeout(() => {
-      isLoading.value = false
-    }, "1000");
-} else {
-  alert("Ошибка: " + res.status);
+const page = ref('Catalog')
+const searchValue = ref('')
+function searchActive(e){
+  searchValue.value=e
+  page.value='Catalog'
 }
-})
-
 </script>
 
 <style scoped>
-.container {
-  max-width: 1000px;
-}
-
-.goods {
-  display: grid;
-  grid-template-columns: repeat(3, 30%);
-  width: 100%;
-  max-width: 1000px;
-  justify-content: center;
-  justify-items: center;
-  gap: 30px;
-  margin: 0 auto;
+.aside {
+  min-width: 300px;
+  border: 1px solid chocolate;
 }
 </style>
